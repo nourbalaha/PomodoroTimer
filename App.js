@@ -1,49 +1,56 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 import moment from "moment";
 import momentDurationFormatSetup from "moment-duration-format";
 import momentTimer from "moment-timer";
 
-function Button({ text, color, background }) {
+function RoundButton({ text, background,cb }) {
   return (
     <View style={[styles.button, { backgroundColor: background }]}>
-      <Text style={{ color }}>{text}</Text>
+      <Text style={styles.buttonTitle} onPress={cb}>{text}</Text>
     </View>
   );
-}
-
-function Timer({ interval }) {
-  const duration = moment.duration(interval).format();
-  return <Text style={styles.timer}>{duration}</Text>;
 }
 
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      session: { seconds: 0, minutes: 25 },
+      timer: moment.duration({ seconds: 0, minutes: 25 }),
+      isWorking:false,
+      interval:undefined,
     };
   }
 
   start = () => {
-    const timer = moment.duration(1, "seconds").timer({loop: true}, function() {
-      if(this.state.session.seconds<=0){
-        this.state.session.minutes
-      }else{
-
-      }
-    });
+    if(!this.state.isWorking){
+      this.state.interval=setInterval(()=>{
+        this.setState({timer:this.state.timer.subtract(1,"seconds"),isWorking:true})
+      },1000);
+    }
+  };
+  
+  stop = () => {
+    if(this.state.isWorking){
+      this.setState({isWorking:false})
+      clearInterval(this.state.interval);
+    }
   };
 
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Pomodoro</Text>
-        <Timer interval={this.state.session} />
+        <Text style={styles.timer}>{this.state.timer.format()}</Text>
         <View style={styles.buttonContainer}>
-          <Button text="Start" color="white" background="green" />
-          <Button text="Stop" color="white" background="red" />
-          <Button text="Reset" color="white" background="grey" />
+          <RoundButton
+            cb={this.start}
+            text="Start"
+            color="white"
+            background="green"
+          />
+          <RoundButton cb={this.stop} text="Stop" color="white" background="red" />
+          <RoundButton text="Reset" color="white" background="grey" />
         </View>
       </View>
     );
@@ -81,6 +88,7 @@ const styles = StyleSheet.create({
     margin: 10
   },
   buttonTitle: {
-    color: "white"
+    color: "white",
+    fontSize: 18
   }
 });
