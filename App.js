@@ -1,14 +1,16 @@
 import React, { Component } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import { TouchableHighlight, StyleSheet, Text, View } from "react-native";
 import moment from "moment";
 import momentDurationFormatSetup from "moment-duration-format";
-import momentTimer from "moment-timer";
+import PercentageCircle from "react-native-percentage-circle";
 
-function RoundButton({ text, background,cb }) {
+function RoundButton({ text, background, cb }) {
   return (
-    <View style={[styles.button, { backgroundColor: background }]}>
-      <Text style={styles.buttonTitle} onPress={cb}>{text}</Text>
-    </View>
+    <TouchableHighlight onPress={cb}>
+      <View style={[styles.button, { backgroundColor: background }]}>
+        <Text style={styles.buttonTitle}>{text}</Text>
+      </View>
+    </TouchableHighlight>
   );
 }
 
@@ -16,41 +18,98 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      currentMode: "Pomodoro",
+      full: moment.duration({ seconds: 0, minutes: 25 }),
       timer: moment.duration({ seconds: 0, minutes: 25 }),
-      isWorking:false,
-      interval:undefined,
+      isWorking: false,
+      interval: undefined
     };
   }
 
   start = () => {
-    if(!this.state.isWorking){
-      this.state.interval=setInterval(()=>{
-        this.setState({timer:this.state.timer.subtract(1,"seconds"),isWorking:true})
-      },1000);
+    if (!this.state.isWorking) {
+      this.state.interval = setInterval(() => {
+        this.setState({
+          timer: this.state.timer.subtract(1, "seconds"),
+          isWorking: true
+        });
+      }, 10);
     }
   };
-  
+
   stop = () => {
-    if(this.state.isWorking){
-      this.setState({isWorking:false})
+    if (this.state.isWorking) {
+      this.setState({ isWorking: false });
       clearInterval(this.state.interval);
     }
   };
 
+  reset = () => {
+    clearInterval(this.state.interval);
+    this.setState({
+      currentMode: "Pomodoro",
+      full: moment.duration({ seconds: 0, minutes: 25 }),
+      timer: moment.duration({ seconds: 0, minutes: 25 }),
+      isWorking: false
+    });
+  };
+
+  switchMode = () => {
+    if (this.state.currentMode === "Pomodoro") {
+      this.setState({
+        currentMode: "Break",
+        full: moment.duration({ seconds: 0, minutes: 5 }),
+        timer: moment.duration({ seconds: 0, minutes: 5 })
+      });
+    } else {
+      this.setState({
+        currentMode: "Pomodoro",
+        full: moment.duration({ seconds: 0, minutes: 25 }),
+        timer: moment.duration({ seconds: 0, minutes: 25 })
+      });
+    }
+  };
+
   render() {
+    let percentage = (this.state.timer * 100) / this.state.full;
+    if (this.state.timer == 0) {
+      this.switchMode();
+    }
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Pomodoro</Text>
-        <Text style={styles.timer}>{this.state.timer.format()}</Text>
+        <Text style={styles.title}>{this.state.currentMode}</Text>
+        <TouchableHighlight onPress={this.switchMode}>
+          <PercentageCircle
+            borderWidth={12}
+            radius={150}
+            percent={percentage}
+            color={
+              this.state.currentMode === "Pomodoro" ? "#00985F" : "#F60000"
+            }
+            innerColor="#3A3A3C"
+          >
+            <Text style={styles.timer}>{this.state.timer.format()}</Text>
+          </PercentageCircle>
+        </TouchableHighlight>
         <View style={styles.buttonContainer}>
           <RoundButton
             cb={this.start}
             text="Start"
             color="white"
-            background="green"
+            background="#00985F"
           />
-          <RoundButton cb={this.stop} text="Stop" color="white" background="red" />
-          <RoundButton text="Reset" color="white" background="grey" />
+          <RoundButton
+            cb={this.stop}
+            text="Stop"
+            color="white"
+            background="#F60000"
+          />
+          <RoundButton
+            cb={this.reset}
+            text="Reset"
+            color="white"
+            background="grey"
+          />
         </View>
       </View>
     );
@@ -62,7 +121,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#222"
+    backgroundColor: "#3A3A3C"
   },
   buttonContainer: {
     flexDirection: "row"
@@ -70,13 +129,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 40,
     textAlign: "center",
-    margin: 10,
+    margin: 20,
     color: "#ddd"
   },
   timer: {
     fontSize: 80,
-    textAlign: "center",
-    margin: 10,
     color: "white"
   },
   button: {
@@ -85,10 +142,12 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     justifyContent: "center",
     alignItems: "center",
-    margin: 10
+    marginTop: 30,
+    marginLeft: 10,
+    marginRight: 10
   },
   buttonTitle: {
     color: "white",
-    fontSize: 18
+    fontSize: 22
   }
 });
