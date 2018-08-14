@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
+import moment from "moment";
+import momentDurationFormatSetup from "moment-duration-format";
+import momentTimer from "moment-timer";
 
 function Button({ text, color, background }) {
   return (
@@ -9,17 +12,38 @@ function Button({ text, color, background }) {
   );
 }
 
+function Timer({ interval }) {
+  const duration = moment.duration(interval).format();
+  return <Text style={styles.timer}>{duration}</Text>;
+}
+
 export default class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      session: { seconds: 0, minutes: 25 },
+    };
+  }
+
+  start = () => {
+    const timer = moment.duration(1, "seconds").timer({loop: true}, function() {
+      if(this.state.session.seconds<=0){
+        this.state.session.minutes
+      }else{
+
+      }
+    });
+  };
 
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Pomodoro</Text>
-        <Text style={styles.counter}>25:00</Text>
+        <Text style={styles.title}>Pomodoro</Text>
+        <Timer interval={this.state.session} />
         <View style={styles.buttonContainer}>
-        <Button text="Start" color="white" background="green"/>
-        <Button text="Stop" color="white" background="red"/>
-        <Button text="Reset" color="white" background="grey"/>
+          <Button text="Start" color="white" background="green" />
+          <Button text="Stop" color="white" background="red" />
+          <Button text="Reset" color="white" background="grey" />
         </View>
       </View>
     );
@@ -34,19 +58,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#222"
   },
   buttonContainer: {
-    flexDirection: "row",
+    flexDirection: "row"
   },
-  welcome: {
+  title: {
     fontSize: 40,
     textAlign: "center",
     margin: 10,
     color: "#ddd"
   },
-  counter: {
+  timer: {
     fontSize: 80,
     textAlign: "center",
     margin: 10,
-    color: "#ddd"
+    color: "white"
   },
   button: {
     width: 80,
@@ -54,9 +78,9 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     justifyContent: "center",
     alignItems: "center",
-    margin: 10,
+    margin: 10
   },
   buttonTitle: {
     color: "white"
-  },
+  }
 });
