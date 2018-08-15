@@ -33,7 +33,7 @@ export default class App extends Component {
           timer: this.state.timer.subtract(1, "seconds"),
           isWorking: true
         });
-      }, 10);
+      }, 1000);
     }
   };
 
