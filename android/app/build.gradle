@@ -97,7 +97,7 @@ android {
     compileSdkVersion 25
 
     defaultConfig {
-        applicationId "com.mvpsoloproject"
+        applicationId "com.pomodorotimer"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion 25
         versionCode 1

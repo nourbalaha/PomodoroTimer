@@ -1,4 +1,4 @@
-package com.mvpsoloproject;
+package com.pomodorotimer;
 
 import android.app.Application;
 

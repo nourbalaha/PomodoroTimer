@@ -60,3 +60,4 @@ buck-out/
 .flowconfig
 .gitattributes
 .watchmanconfig
+yarn.lock
